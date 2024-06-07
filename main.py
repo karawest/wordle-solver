@@ -21,7 +21,12 @@ class WordleSolver:
         print("Congratulations, you found the word in {} guesses!".format(len(self.guesses)))
 
     def guess(self):
-        self.guesses.append(choice(self.words))
+        # My first attempt at weighting words, just by frequency of letters
+        self.guesses.append(self.weight_words())
+
+        # Uncomment this if you want to just randomly select a word
+        # self.guesses.append(choice(self.words))
+        
         print("Word to guess is: {}".format(self.guesses[-1]))
         while True:
             result = input("Input results with G for Green, Y for Yellow, and B for Blank: ")
@@ -43,8 +48,15 @@ class WordleSolver:
                     self.words = [wd for wd in self.words if letter in wd and wd[i] != letter]
                 else:
                     if not any([result[i] == "G" and guess[i] == letter for i in range(5)]):
-                        self.words = [wd for wd in self.words if letter not in wd]					
-		
+                        self.words = [wd for wd in self.words if letter not in wd]
+
+    def weight_words(self):
+        # Develop a weighting matrix for each letter at each position for the remaining words
+        # and then select the highest ranked word from the list
+        alph = 'abcdefghijklmnopqrstuvwxyz'
+        counts = [[[wd[i] for wd in self.words].count(lt) for i in range(5)] for lt in alph]
+        values = [sum([counts[alph.index(wd[i])][i] for i in range(5)]) for wd in self.words]
+        return self.words[values.index(max(values))]
 
 if __name__ == '__main__':
     WordleSolver()
